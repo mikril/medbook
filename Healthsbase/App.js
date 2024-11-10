@@ -1,32 +1,19 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, SafeAreaView,Button,TextInput,Image,Alert } from 'react-native';
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import Registration from './components/registration/registration';  
 
-export default function App() {
-  handleButtonmPress = () => Alert.alert("Регистрация прошла", "Красава",[
-      {text:'Да'},
-      {text:'Да'}
-  ]);
-  
+
+const Stack = createStackNavigator();
+
+const App = () => {
   return (
-    <SafeAreaView style={styles.container}>
-      <Image/>
-      <Text>Регистрация</Text>
-      <TextInput style={styles.input} value='Email'></TextInput>
-      <TextInput style={styles.input} value='Телефон'></TextInput>
-      <TextInput style={styles.input} value='Пароль'></TextInput>
-      <TextInput style={styles.input} value='Повторите пароль'></TextInput>
-      <Button title ='Зарегестрироваться' onPress={handleButtonmPress}/>
-    </SafeAreaView>
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Register">
+        <Stack.Screen name="Register" component={Registration} options={{ headerShown: false }}/>
+      </Stack.Navigator>
+    </NavigationContainer>
   );
-}
+};
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  input: {
-    color: '#bbb',
-    borderWidth: 1,
-  },
-}); 
+export default App;
