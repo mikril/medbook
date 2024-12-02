@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Text, TextInput, Button, Alert } from 'react-native';
+import {StyleSheet, Text, TextInput, Button, Alert, Image } from 'react-native';
 import { registerUser } from './api'; // Импортируем функцию для запроса
 
 const Registration = ({ navigation }) => {
@@ -11,6 +11,7 @@ const Registration = ({ navigation }) => {
   const handleButtonPress = async () => {
     if (password !== confirmPassword) {
       Alert.alert('Ошибка', 'Пароли не совпадают');
+      alert('Пароли не совпадают');
       return;
     }
 
@@ -23,6 +24,7 @@ const Registration = ({ navigation }) => {
     try {
       const data = await registerUser(userData);
       Alert.alert('Успех', 'Регистрация успешна');
+      alert('Регистрация успешна');
       navigation.navigate('Home'); 
     } catch (error) {
       Alert.alert('Ошибка', error.message);
@@ -32,6 +34,7 @@ const Registration = ({ navigation }) => {
   return (
     <>
       <Text>Регистрация</Text>
+      <Image source={require('./src/young man sitting with a laptop and waving his hand.png')} />
       <TextInput
         value={email}
         onChangeText={setEmail}
@@ -59,4 +62,14 @@ const Registration = ({ navigation }) => {
   );
 };
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  input: {
+    color: '#bbb',
+    borderWidth: 1,
+  },
+}); 
 export default Registration;
