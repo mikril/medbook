@@ -23,7 +23,7 @@ const Measurements = () => {
           renderItem={({ item }) => <Measurement item={item} />}
           keyExtractor={(item) => item.title}
           ListFooterComponent={
-            <TouchableOpacity style={styles.buttonAdd} onPress={() => navigation.navigate('AddAnalyzes')}>+</TouchableOpacity>
+            <TouchableOpacity style={styles.buttonAdd} onPress={() => navigation.navigate('AddAnalyzes')}><Text>+</Text></TouchableOpacity>
           } // Добавляем кнопку после списка
         />
       </View>

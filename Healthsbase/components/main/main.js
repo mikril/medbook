@@ -7,9 +7,11 @@ import PressureChart from './pressureChart/pressureChart';
 import NavigationPanel from '../navigationPanel/navigationPanel';
 import { useNavigation } from '@react-navigation/native';
 import { useClientData } from '../../ClientDataContext';
-
+import  Loading  from '../loading/loading';
+import { useFonts, Roboto_400Regular, Roboto_500Medium } from '@expo-google-fonts/roboto';
  
 const Main = () => {
+
   const { state } = useClientData();
   const [clientData, setClientData] = useState(state.clientData);
 
@@ -17,11 +19,13 @@ const Main = () => {
 
   // Имитация запроса данных клиента после авторизации
   useEffect(() => {
+    console.log(state.clientData)
+    console.log(localStorage)
     setClientData(state.clientData);
   }, [state.clientData]);
 
-  if (!clientData) {
-    return <Text>Загрузка...</Text>;
+  if (!clientData.clientName) {
+    return  <Loading />;
   }
 
   return (
@@ -35,12 +39,13 @@ const Main = () => {
       </View>
       <View style={styles.container}>
       <TouchableOpacity  style={styles.header} onPress={() => navigation.navigate('Acount', { userId: clientData.id })}>
-        <Image source={ clientData.logo } style={styles.profileImage} />
+        <Image source={ clientData.avatar } style={styles.profileImage} />
         <Text style={styles.welcomeText}>Добрый день, {clientData.clientName}</Text>
       </TouchableOpacity >
 
 
-      <View style={styles.notificationList}>
+      <TouchableOpacity style={styles.notificationList}
+      onPress={() => navigation.navigate('Notifications')}>
       {clientData.notifications.map((notification, index) => (
         <Notification
           key={index}
@@ -50,7 +55,7 @@ const Main = () => {
           style={styles.notificationCard}
         />
       ))}
-      </View>
+      </TouchableOpacity>
 
       <View style={styles.chartContainer}>
         <PressureChart data={clientData.pressureChart}/>
@@ -69,12 +74,13 @@ const Main = () => {
       </View>
 
       <View style={styles.appointmentList}>  
-      {clientData.appointments.slice(-2).map((appointment, index) => (
+      {clientData.appointments.slice(0, 2).map((appointment, index) => (
         <Appointment
           key={index}
           doctorType={appointment.doctorType}
           appointmentData={appointment.appointmentData}
           doctorComment={appointment.doctorComment}
+          id={appointment.id}
           style={styles.appointmentsContainer}
         />
       ))}
@@ -101,6 +107,8 @@ const styles = StyleSheet.create({
   page: {
     height: height,
     backgroundColor: '#FBFBFB',
+    
+    
   },
   menu: {
   },
@@ -132,9 +140,10 @@ const styles = StyleSheet.create({
     position: "fixed",
     top: 0
   },
+  
   headerText: {
     fontSize: width * 0.088,
-    fontWeight: 'bold',
+    fontWeight: "bold"
   },
   listMeasurements:{
     paddingHorizontal: 10,

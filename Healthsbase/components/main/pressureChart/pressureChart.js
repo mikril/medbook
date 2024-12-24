@@ -6,12 +6,12 @@ import { Dimensions, ScrollView, Text, View, StyleSheet } from 'react-native';
 const { width, height } = Dimensions.get('window');
 const PressureChart = ({ data }) => {
   // Подготовим данные для графика
-  
+  const latestData = data.slice(-4);
   const formattedData = {
-    labels: data.map(item => item.date),  // Сохраняем метки по оси X
+    labels: latestData.map(item => item.date),  // Сохраняем метки по оси X
     datasets: [
       {
-        data: data.map(item => item.lower),  // Нижнее давление
+        data: latestData.map(item => item.lower),  // Нижнее давление
         color: (opacity = 1) => `rgba(0,0, 10, ${opacity})`,  // Синий цвет для нижнего давления
         strokeWidth: 2,
         label: 'Нижнее',  // Добавим метку для нижнего давления
@@ -19,7 +19,7 @@ const PressureChart = ({ data }) => {
         fillShadowGradientOpacity: 0,
       },
       {
-        data: data.map(item => item.upper),  // Верхнее давление
+        data: latestData.map(item => item.upper),  // Верхнее давление
         color: (opacity = 1) => `rgba(0, 0, 255, ${opacity})`,  // Синие пунктирные линии
         strokeWidth: 2,
         dashArray: [5, 5], // Пунктирная линия для верхнего давления
@@ -28,7 +28,7 @@ const PressureChart = ({ data }) => {
         fillShadowGradientOpacity: 0,
       },
       {
-        data: data.map(item => item.pulse),  // Пульс
+        data: latestData.map(item => item.pulse),  // Пульс
         color: (opacity = 1) => `rgba(255, 0, 0, ${opacity})`,  // Красный цвет для пульса
         strokeWidth: 2,
         label: 'Пульс',  // Добавим метку для пульса

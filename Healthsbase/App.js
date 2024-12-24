@@ -1,5 +1,5 @@
   import React from 'react';
-import { StyleSheet, View } from 'react-native';
+  import { StyleSheet, View } from 'react-native';
   import { NavigationContainer } from '@react-navigation/native';
   import { createStackNavigator } from '@react-navigation/stack';
   import Registration from './components/registration/registration';  
@@ -8,6 +8,7 @@ import { StyleSheet, View } from 'react-native';
   import Accounts from './components/accounts/accounts';  
   import Main from './components/main/main';
   import Add from './components/add/add';
+  import { Provider as PaperProvider } from 'react-native-paper';
 
   import CurrentMeasurement from './components/currentMeasurement/currentMeasurement';
   import CurrentAppointment from './components/currentAppointment/currentAppointment';
@@ -19,13 +20,24 @@ import { StyleSheet, View } from 'react-native';
   import AddNotification from './components/addNotification/addNotification';
   import { ClientDataProvider } from './ClientDataContext';
   import AddPressure from './components/addPressure/addPressure';
+  import { useFonts } from 'expo-font';
+  import { Text, TextInput} from 'react-native';
 
-  const Stack = createStackNavigator();CurrentAppointment
+  import { DefaultTheme } from 'react-native-paper';
+
+  // Устанавливаем шрифт для всех компонентов Text и TextInput
+ 
+
+const Stack = createStackNavigator();
 
   const App = () => {
+    
+
     return (
-      <ClientDataProvider style={styles.main}>
+      
+     
       <NavigationContainer>
+      <ClientDataProvider >
         <Stack.Navigator initialRouteName="Main">
           <Stack.Screen name="Authorizate" component={Authorization} options={{ headerShown: false }}/>
           <Stack.Screen name="Register" component={Registration} options={{ headerShown: false }}/>
@@ -43,12 +55,9 @@ import { StyleSheet, View } from 'react-native';
           <Stack.Screen name="Notifications" component={Notifications} options={{ headerShown: false }}/>
           <Stack.Screen name="AddNotification" component={AddNotification} options={{ headerShown: false }}/>
         </Stack.Navigator>
-      </NavigationContainer>
+      
       </ClientDataProvider>
+      </NavigationContainer>
     );
   };
-  const styles = StyleSheet.create({
-    main: {
-      
-    },})
   export default App;

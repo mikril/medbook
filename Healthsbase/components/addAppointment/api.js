@@ -59,3 +59,27 @@ export const handleSubmit = (imageFile, setDoctorType, setDateAppointment, setCl
   
   sendAppointment(base64, extension);
 };
+
+export const addAppointment  = async (accountId, appointmentData) => {
+  console.log('Добавляем приём врача', accountId, appointmentData);  // Логируем перед отправкой
+
+  try {
+    const response = await fetch(`http://127.0.0.1:8000/user/${accountId}/appointment`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body:  JSON.stringify(appointmentData), // В данном случае тело запроса пустое, так как на сервере используется дефолтные значения
+    });
+    if (!response.ok) {
+      throw new Error(`Ошибка: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } 
+  catch (error) {
+    console.error("Ошибка при добавлении приёма врача:", error);
+    throw error;
+  }
+};

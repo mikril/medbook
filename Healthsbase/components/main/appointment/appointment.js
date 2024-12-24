@@ -1,16 +1,22 @@
 import React from 'react';
-import { Text, View, StyleSheet, Dimensions } from 'react-native';
+import { Text, View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+
 const { width, height } = Dimensions.get('window');
 
-const Appointment = ({ doctorType, appointmentData, doctorComment }) => {
+
+const Appointment = ({ doctorType, appointmentData, doctorComment, id}) => {
+  const navigation = useNavigation();
+
   return (
-    <View style={styles.appointmentContainer}>
+    <TouchableOpacity style={styles.appointmentContainer}
+    onPress={() => navigation.navigate('CurrentAppointment', { id: id })}>
       <View style={styles.header}>
         <Text style={styles.doctorType}>{doctorType}</Text>
         <Text style={styles.appointmentData}>{appointmentData}</Text>
       </View>
       <Text style={styles.doctorComment} numberOfLines={2}>{doctorComment}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 

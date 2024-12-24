@@ -18,25 +18,132 @@ const Acount = ({ route }) => {
   const navigation = useNavigation();
   const [selectedDate, setSelectedDate] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const { state } = useClientData();
+  const { state, dispatch } = useClientData();
   const [clientData, setClientData] = useState(state.clientData);
 
-  const handleSave = () => {
-    const userData = { 
-      name, 
-      gender, 
-      role, 
-      comment 
-    };
+  const [nameError, setNameError] = useState(false);
 
-    acountUser(userData)
-      .then((data) => {
-        Alert.alert('Данные сохранены', 'Ваши данные успешно обновлены');
-      })
-      .catch((error) => {
-        Alert.alert('Ошибка', error.message);
-      });
+const handleSave = async () => {
+  // Проверка имени пользователя
+  if (!name.trim()) {
+    setNameError(true);
+    Alert.alert('Ошибка', 'Пожалуйста, заполните имя пользователя.');
+    return;
+  } else {
+    setNameError(false);
+  }
+
+  if (!selectedDate) {
+    Alert.alert('Ошибка', 'Пожалуйста, выберите дату рождения.');
+    return;
+  }
+
+  let formattedDate;
+  if (selectedDate.includes('.')) {
+    formattedDate = selectedDate.split('.').reverse().join('-');
+  } else if (selectedDate.includes('/')) {
+    formattedDate = selectedDate.split('/').join('-');
+  }
+
+  const userData = {
+    avatar,
+    name,
+    gender,
+    role,
+    comment,
+    birthday: formattedDate,
   };
+
+  fetch(`http://127.0.0.1:8000/user/${userId}`, {
+    method: 'PATCH',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(userData),
+  })
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(`Ошибка сервера: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then((data) => {
+      Alert.alert('Успех', 'Данные сохранены успешно');
+    })
+    .catch((error) => {
+      Alert.alert('Ошибка', `Не удалось сохранить данные: ${error.message}`);
+    });
+
+  await dispatch({
+    type: 'SET_CLIENT_DATA',
+    payload: {
+      id: 'asd',
+      id_account: clientData.id_account,
+      clientName: null,
+      avatar: null,
+      notifications: [],
+      pressureChart: [],
+      lastMeasurements: [],
+      nextAppointments: [],
+      medicines: [],
+      allMeasurements: [],
+      users: clientData.users,
+      appointments: [],
+    },
+  });
+  await navigation.navigate('Main');
+};
+  
+  const deleteProfile = async () => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/user/delete/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ошибка сервера: ${response.status}`);
+      }
+      
+
+      const updatedUsers = clientData.users.filter(user => user.id !== userId);
+      // Очищаем localStorage
+      await localStorage.setItem('clientData', JSON.stringify({
+        id: updatedUsers[0].id,  // ID пользователя
+        id_account: clientData.id_account
+      }));
+      console.log('Профиль был успешно удалён');
+      // Обновляем глобальное состояние
+      await dispatch({
+        type: 'SET_CLIENT_DATA',
+        payload: {
+          id: updatedUsers[0].id,
+          id_account: clientData.id_account,
+          clientName: null,
+          avatar: null,
+          notifications: [],
+          pressureChart: [],
+          lastMeasurements: [],
+          nextAppointments: [],
+          medicines: [],
+          allMeasurements: [],
+          users: updatedUsers,
+          appointments: [],
+        },
+      });
+
+      // Перенаправляем пользователя
+      await navigation.navigate('Main');
+    } catch (error) {
+      console.error('Не удалось удалить профиль:', error.message);
+    }
+  };
+  
+  
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
@@ -67,12 +174,15 @@ const Acount = ({ route }) => {
         <Image source={avatar} style={styles.logo} />
       </View>
       <Text style={styles.text}>Имя</Text>
-      <TextInput
-        value={name}
-        onChangeText={setName}
-        placeholder="Имя"
-        style={styles.input}
-      />
+<TextInput
+  value={name}
+  onChangeText={(text) => {
+    setName(text);
+    if (text.trim()) setNameError(false); // Сбрасываем ошибку, если поле заполнено
+  }}
+  placeholder="Имя"
+  style={[styles.input, nameError && styles.errorInput]} // Добавляем стиль ошибки, если ошибка есть
+/>
 
       <Text style={styles.text}>Пол</Text>
       <View style={styles.pickerContainer}>
@@ -151,7 +261,7 @@ const Acount = ({ route }) => {
         <Text style={styles.saveButtonText}>Сохранить</Text>
       </TouchableOpacity>
 
-      <TouchableOpacity style={styles.deleteButton} onPress={() => alert('Удалить')}>
+      <TouchableOpacity style={styles.deleteButton} onPress={deleteProfile}>
         <Text style={styles.deleteButtonText}>Удалить</Text>
       </TouchableOpacity>
     </View>
@@ -302,6 +412,9 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: '#007bff',
   },
+  errorInput: {
+    borderColor: '#FF4D4D', },
+
   closeButtonText: {
     color: '#fff',
     fontSize: width * 0.046,

@@ -11,24 +11,60 @@ import {
 import { authorizateUser } from './api';
 import { useNavigation } from '@react-navigation/native';
 import { Dimensions } from 'react-native';
+import { useClientData } from '../../ClientDataContext';
 
-// Вычисляем ширину и высоту экрана
 const { width, height } = Dimensions.get('window');
 
 const Authorization = () => {
+  const { state, dispatch } = useClientData();
+
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [phoneError, setPhoneError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+  const [generalError, setGeneralError] = useState('');
   const navigation = useNavigation();
-  
+
   const handleButtonPress = async () => {
-    navigation.navigate('Main');
+    setPhoneError('');  // сброс ошибок при попытке отправить
+    setPasswordError('');
+    setGeneralError('');
+
+    // Проверка на пустые поля
+    let valid = true;
+    if (!phone) {
+      setPhoneError('Телефон не может быть пустым');
+      valid = false;
+    }
+    if (!password) {
+      setPasswordError('Пароль не может быть пустым');
+      valid = false;
+    }
+
+    // Если хотя бы одно поле пустое, не продолжаем обработку
+    if (!valid) {
+      return;
+    }
+
     try {
       const userData = { phone, password };
-      const data = await authorizateUser(userData);
+
+      // Дожидаемся ответа от сервера
+      const data = await authorizateUser(userData, dispatch);
+
+      // Если авторизация успешна, показываем сообщение и переходим на страницу Main
       Alert.alert('Успех', 'Авторизация успешна');
       navigation.navigate('Main');
     } catch (error) {
-      Alert.alert('Ошибка', error.message);
+      // Обработка ошибок авторизации
+      const errorMessage = error.message || 'Что-то пошло не так';
+      if (errorMessage === 'Аккаунт с таким номером телефона не найден') {
+        setPhoneError('Аккаунт с таким номером телефона не найден');
+      } else if (errorMessage === 'Неверный пароль') {
+        setPasswordError('Пароль неверный');
+      } else {
+        setGeneralError(errorMessage);
+      }
     }
   };
 
@@ -40,32 +76,32 @@ const Authorization = () => {
         resizeMode="contain"
       />
       <Text style={styles.title}>Авторизация</Text>
-      <TextInput
-        value={phone}
-        onChangeText={setPhone}
-        placeholder="Введите телефон"
-        keyboardType="phone-pad"
-        style={styles.input}
-      />
-      <TextInput
-        value={password}
-        onChangeText={setPassword}
-        placeholder="Введите пароль"
-        secureTextEntry
-        style={styles.input}
-      />
+      {generalError ? <Text style={styles.errorText}>{generalError}</Text> : null}
+
+      <View style={styles.inputContainer}>
+        {phoneError && <Text style={styles.errorText}>{phoneError}</Text>}
+        <TextInput
+          value={phone}
+          onChangeText={setPhone}
+          placeholder="Введите телефон"
+          keyboardType="phone-pad"
+          style={[styles.input, phoneError && styles.inputError]}
+        />
+      </View>
+
+      <View style={styles.inputContainer}>
+        {passwordError && <Text style={styles.errorText}>{passwordError}</Text>}
+        <TextInput
+          value={password}
+          onChangeText={setPassword}
+          placeholder="Введите пароль"
+          secureTextEntry
+          style={[styles.input, passwordError && styles.inputError]}
+        />
+      </View>
+
       <TouchableOpacity style={styles.button} onPress={handleButtonPress}>
         <Text style={styles.buttonText}>Продолжить</Text>
-      </TouchableOpacity>
-      
-      <Text style={styles.orText}>или</Text>
-
-      <TouchableOpacity style={styles.googleButton} onPress={() => alert('Войти через Google')}>
-        <Image
-          source={require('./src/logoGoogle.png')} // Добавьте путь к вашему логотипу 
-          style={styles.googleLogo}
-        />
-        <Text style={styles.googleButtonText}>Войти через Google</Text>
       </TouchableOpacity>
 
       <Text style={styles.registerText}>
@@ -84,7 +120,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#ffffff',
-    paddingHorizontal: width * 0.05, 
+    paddingHorizontal: width * 0.05,
   },
   image: {
     width: width * 0.65,
@@ -92,11 +128,15 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.024,
   },
   title: {
-    fontSize: width * 0.087, 
+    fontSize: width * 0.087,
     fontWeight: 'bold',
     marginBottom: height * 0.024,
     color: '#000',
     alignSelf: 'flex-start',
+  },
+  inputContainer: {
+    width: '100%',
+    marginBottom: height * 0.024,
   },
   input: {
     width: '100%',
@@ -106,8 +146,10 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderRadius: 8,
     paddingHorizontal: width * 0.03,
-    marginBottom: height * 0.024,
     backgroundColor: '#f9f9f9',
+  },
+  inputError: {
+    borderColor: '#ff0000',
   },
   button: {
     width: '100%',
@@ -123,32 +165,11 @@ const styles = StyleSheet.create({
     fontSize: width * 0.045,
     fontWeight: 'bold',
   },
-  orText: {
-    fontSize: width * 0.04, 
-    color: '#000',
-    textAlign: 'center',
-    marginBottom: height * 0.024,
-  },
-  googleButton: {
-    width: '100%',
-    height: height * 0.06,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-    borderRadius: 8,
-    backgroundColor: '#ffffff',
-    marginBottom: height * 0.024,
-  },
-  googleButtonText: {
-    color: '#000',
-    fontSize: width * 0.045,
-    marginLeft: width * 0.01,
-  },
-  googleLogo: {
-    width: width * 0.1,
-    height: width * 0.1,
+  errorText: {
+    fontSize: width * 0.04,
+    color: '#ff0000',
+    textAlign: 'left',
+    marginBottom: height * 0.01,
   },
   registerText: {
     fontSize: width * 0.04,

@@ -3,27 +3,48 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  Button,
   Alert,
   Image,
   View,
   Dimensions,
-  Platform,
-  KeyboardAvoidingView,
   ScrollView,
   TouchableOpacity,
 } from 'react-native';
 import { registerUser } from './api'; 
+import { useClientData } from '../../ClientDataContext';
 
 const Registration = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  
+  const { state, dispatch } = useClientData();
+  const [errors, setErrors] = useState({});
+  const validateFields = () => {
+    const newErrors = {};
+
+    if (!email.includes('@')) {
+      newErrors.email = 'Введите корректный email';
+    }
+    if (!phone.match(/^\+?\d{10,15}$/)) {
+      newErrors.phone = 'Введите корректный номер телефона';
+    }
+    if (password.length < 6) {
+      newErrors.password = 'Пароль должен содержать не менее 6 символов';
+    }
+    if (password !== confirmPassword) {
+      newErrors.confirmPassword = 'Пароли не совпадают';
+    }
+
+    setErrors(newErrors);
+
+    // Возвращаем true, если нет ошибок
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleButtonPress = async () => {
-    if (password !== confirmPassword) {
-      Alert.alert('Ошибка', 'Пароли не совпадают');
+    if (!validateFields()) {
       return;
     }
 
@@ -32,9 +53,8 @@ const Registration = ({ navigation }) => {
       phone,
       password,
     };
-    navigation.navigate('Main');
     try {
-      const data = await registerUser(userData);
+      const data = await registerUser(userData, dispatch);
       Alert.alert('Успех', 'Регистрация успешна');
       navigation.navigate('Main');
     } catch (error) {
@@ -43,44 +63,50 @@ const Registration = ({ navigation }) => {
   };
 
   return (
-    <View
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-    >
+    <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.content}>
         <Image
           source={require('./src/young man sitting with a laptop and waving his hand.png')}
           style={styles.image}
         />
         <Text style={styles.title}>Регистрация</Text>
+
+        {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
         <TextInput
-          style={styles.input}
+          style={[styles.input, errors.email && styles.errorInput]}
           value={email}
           onChangeText={setEmail}
           placeholder="Email"
           keyboardType="email-address"
         />
+
+        {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
         <TextInput
-          style={styles.input}
+          style={[styles.input, errors.phone && styles.errorInput]}
           value={phone}
           onChangeText={setPhone}
           placeholder="Телефон"
           keyboardType="phone-pad"
         />
+
+        {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
         <TextInput
-          style={styles.input}
+          style={[styles.input, errors.password && styles.errorInput]}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
           placeholder="Пароль"
         />
+
+        {errors.confirmPassword && <Text style={styles.errorText}>{errors.confirmPassword}</Text>}
         <TextInput
-          style={styles.input}
+          style={[styles.input, errors.confirmPassword && styles.errorInput]}
           secureTextEntry
           value={confirmPassword}
           onChangeText={setConfirmPassword}
           placeholder="Повторите пароль"
         />
+
         <TouchableOpacity style={styles.button} onPress={handleButtonPress}>
           <Text style={styles.buttonText}>Зарегистрироваться</Text>
         </TouchableOpacity>
@@ -104,13 +130,13 @@ const styles = StyleSheet.create({
     padding: height * 0.017,
   },
   image: {
-    width: width * 0.65, // Картинка уменьшена до 40% от ширины экрана
-    height: height * 0.25, // Пропорциональная высота
+    width: width * 0.65,
+    height: height * 0.25,
     resizeMode: 'contain',
     marginBottom: height * 0.02,
   },
   title: {
-    fontSize: isSmallScreen ? width * 0.06 : width * 0.09, // Заголовок адаптируется под экран
+    fontSize: isSmallScreen ? width * 0.06 : width * 0.09,
     fontWeight: 'bold',
     alignSelf: 'flex-start',
     marginBottom: height * 0.02,
@@ -125,6 +151,15 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.02,
     fontSize: width * 0.04,
   },
+  errorInput: {
+    borderColor: '#FF4D4D',
+  },
+  errorText: {
+    alignSelf: 'flex-start',
+    color: '#FF4D4D',
+    marginBottom: height * 0.01,
+    fontSize: width * 0.035,
+  },
   button: {
     width: '100%',
     height: height * 0.07,
@@ -136,7 +171,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: isSmallScreen ? width * 0.045 : width * 0.05, // Шрифт текста кнопки зависит от экрана
+    fontSize: isSmallScreen ? width * 0.045 : width * 0.05,
     fontWeight: 'bold',
   },
 });

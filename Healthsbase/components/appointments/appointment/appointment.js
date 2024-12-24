@@ -28,6 +28,7 @@ const Appointment = ({ item }) => {
 };
 
 const styles = StyleSheet.create({
+  
   measurementCard: {
     flexDirection: 'row',
     alignItems: 'center',

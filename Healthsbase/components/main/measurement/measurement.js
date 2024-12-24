@@ -1,13 +1,17 @@
 import React from 'react';
-import { Text, View, StyleSheet, Dimensions} from 'react-native';
+import { Text, View, StyleSheet, Dimensions, TouchableOpacity} from 'react-native';
 const { width } = Dimensions.get('window'); // Получаем размеры экрана
+import { useNavigation } from '@react-navigation/native';
 
 const Measurement = ({ title = 'Показатель', description = 'Значение' }) => {
+  const navigation = useNavigation();
+
   return (
-    <View style={styles.container}>
+    <TouchableOpacity style={styles.container}
+    onPress={() => navigation.navigate('CurrentMeasurement', { title: title })}>
       <Text style={styles.title}>{title}</Text>
       <Text style={styles.description}>{description}</Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 

@@ -51,3 +51,28 @@ export const handleSubmit = async (imageFile, setDate, setAnalyzes) => {
     console.error('Ошибка:', error);
   }
 };
+
+export const addAnalyze2  = async (accountId, analyzeData) => {
+  console.log('Добавляем анализ', accountId, analyzeData);  // Логируем перед отправкой
+
+  try {
+    const response = await fetch(`http://127.0.0.1:8000/user/${accountId}/analyzes`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body:  JSON.stringify(analyzeData), // В данном случае тело запроса пустое, так как на сервере используется дефолтные значения
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Ошибка: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    return result;
+  } 
+  catch (error) {
+    console.error("Ошибка при добавлении анализа:", error);
+    throw error;
+  }
+};

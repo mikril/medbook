@@ -141,6 +141,7 @@ const Notifications = () => {
 const styles = StyleSheet.create({
   page: {
     height: height,
+    backgroundColor: '#FBFBFB',
   },
   menu: {
   },
@@ -182,7 +183,9 @@ const styles = StyleSheet.create({
     marginVertical: height * 0.011,
   },
   addButtonText: {
-    color: '#000',
+    fontWeight: 'bold',
+    fontSize: width * 0.04,
+    color: '#ccc',
   },
   noDataText: {
     fontSize: width * 0.04,

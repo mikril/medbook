@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, Image, TouchableOpacity, Dimensions, Modal } from 'react-native';
 import { useClientData } from '../../ClientDataContext';
+import { Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import NavigationPanel from '../navigationPanel/navigationPanel';
 
@@ -10,7 +11,7 @@ const { width, height } = Dimensions.get('window');
 const CurrentAppointment = ({ route }) => {
     const [data, setData] = useState([]);
     const { id } = route.params;
-    const { state } = useClientData();
+    const { state, dispatch } = useClientData();
     const [clientData, setClientData] = useState(state.clientData);
     const [selectedPhoto, setSelectedPhoto] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
@@ -32,6 +33,48 @@ const CurrentAppointment = ({ route }) => {
             setSelectedPhoto(filteredData.photo);
         }
     }, [id, state.clientData]);
+
+    const handleDelete = async () => {
+        try {
+            const response = await fetch(`http://127.0.0.1:8000/delete/appointment/${id}`, {
+                method: 'DELETE',
+            });
+
+            if (response.ok) {
+                Alert.alert("Успех", "Приём успешно удалён", [
+                    {
+                        text: "OK",
+                        onPress: () => navigation.navigate('Appointments'),
+                    },
+                ]);
+            } else {
+                const errorData = await response.json();
+                Alert.alert("Ошибка", errorData.detail || "Не удалось удалить приём");
+            }
+
+            await dispatch({
+                type: "SET_CLIENT_DATA",
+                payload: {
+                  id: "asd",  // Оставляем только id
+                  id_account: clientData.id_account,  // Оставляем только id_account
+                  clientName: null,  // Обнуляем clientName
+                  avatar: null,  // Обнуляем avatar
+                  notifications: [],  // Обнуляем notifications
+                  pressureChart: [],  // Обнуляем pressureChart
+                  lastMeasurements: [],  // Обнуляем lastMeasurements
+                  nextAppointments: [],  // Обнуляем nextAppointments
+                  medicines: [],  // Обнуляем medicines
+                  allMeasurements: [],  // Обнуляем allMeasurements
+                  users: [],  // Обнуляем users
+                  appointments: []
+                },
+              });
+              await navigation.navigate('Main');
+        } catch (error) {
+            console.error(error);
+            Alert.alert("Ошибка", "Произошла ошибка при удалении приёма");
+        }
+    };
     
     return (
         <View style={styles.page}>
@@ -65,7 +108,9 @@ const CurrentAppointment = ({ route }) => {
                             style={styles.icon}
                         />
                     </TouchableOpacity>
-
+                    <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
+                        <Text style={styles.deleteButtonText}>Удалить</Text>
+                    </TouchableOpacity>
                     <Modal
                         visible={isModalVisible}
                         animationType="fade"
@@ -102,10 +147,36 @@ const CurrentAppointment = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
+    deleteButton: {
+        width: '100%',
+        height: height * 0.045,
+        backgroundColor: '#fff',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 8,
+        shadowColor: '#000', // Цвет тени
+        shadowOffset: { width: 0, height: 2 }, // Смещение тени (iOS)
+        shadowOpacity: 0.25, // Прозрачность тени (iOS)
+        shadowRadius: 3.84, // Радиус размытия тени (iOS)
+        elevation: 5, // Тень для Android
+      },
+      deleteButtonText: {
+        color: '#ff4d4d',
+        fontSize: width * 0.044,
+      },
+    page: {
+        height: height
+    },
+    menu: {  
+    },
     container: {
+        height: height,
+        overflow:"scroll",
         flex: 1,
-        padding: width * 0.05,
-        backgroundColor: '#fbfbfb',
+        padding: width * 0.05,  // Отступы относительно ширины экрана
+        backgroundColor: '#FBFBFB',
+        
+        paddingBottom: 100,
     },
     header: {
         fontSize: width * 0.088,

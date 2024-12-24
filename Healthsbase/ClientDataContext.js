@@ -1,291 +1,293 @@
-// ClientDataContext.js
-import React, { createContext, useReducer, useContext, useEffect } from 'react';
+import React, { createContext, useContext, useReducer, useEffect } from 'react';
+import { useNavigation } from '@react-navigation/native'; // Для редиректа
 
-// Инициализация состояния
+// Дефолтные данные
+const data = {
+  clientName: null,
+  id: null,
+  id_account: null,
+  avatar: null,
+  notifications: [],
+  pressureChart: [],
+  lastMeasurements: [],
+  nextAppointments: [],
+  medicines: [],
+  allMeasurements: [],
+  users: [],
+  appointments: []
+};
+
+// Начальное состояние
 const initialState = {
-  clientData: null,
-  loading: true,
-  error: null,
+  clientData: data,
 };
 
-// Действия для редюсера
-const actionTypes = {
-  SET_CLIENT_DATA: 'SET_CLIENT_DATA',
-  SET_LOADING: 'SET_LOADING',
-  SET_ERROR: 'SET_ERROR',
-};
-
-// Редюсер
+// Редьюсер для обновления состояния
 const clientDataReducer = (state, action) => {
   switch (action.type) {
-    case actionTypes.SET_CLIENT_DATA:
-      return { ...state, clientData: action.payload, loading: false };
-    case actionTypes.SET_LOADING:
-      return { ...state, loading: true };
-    case actionTypes.SET_ERROR:
-      return { ...state, error: action.payload, loading: false };
+    case 'SET_CLIENT_DATA':
+      return { ...state, clientData: { ...state.clientData, ...action.payload } };
     default:
       return state;
   }
 };
 
-// Создание контекста
 const ClientDataContext = createContext();
 
-// Хук для использования контекста
-export const useClientData = () => {
-  return useContext(ClientDataContext);
-};
-
-// Провайдер
+// Провайдер для контекста
 export const ClientDataProvider = ({ children }) => {
   const [state, dispatch] = useReducer(clientDataReducer, initialState);
-
-  // Имитация запроса данных клиента после авторизации
-  const fetchClientData = async () => {
-    dispatch({ type: actionTypes.SET_LOADING }); // Устанавливаем состояние загрузки
-
-    try {
-      // Имитация запроса
-      const data = {
-        clientName: 'Имя',
-        id:'226',
-        logo: 'https://m.media-amazon.com/images/M/MV5BMTY1ODUzNzcxN15BMl5BanBnXkFtZTcwMjQ1MDUwOA@@._V1_.jpg',
-        notifications: [
-          { type: 'Посещение врача', title: 'Кардиолог', description: 'Завтра в 14:00' },
-          { type: 'Прием лекарств', title: 'Ношпа', description: '12:30' },
-        ],
-        pressureChart: [
-          { date: '10.09.2024', lower: 120, upper: 140, pulse: 60 },
-          { date: '11.09.2024', lower: 130, upper: 150, pulse: 85 },
-          { date: '12.09.2024', lower: 125, upper: 145, pulse: 88 },
-          { date: '13.09.2024', lower: 140, upper: 160, pulse: 90 },
-          { date: '14.09.2024', lower: 135, upper: 155, pulse: 87 }
-        ],
-        lastMeasurements: [
-          { title: 'Давление', description: '120/80' },
-          { title: 'Пульс', description: '72 уд./мин' },
-          { title: 'Сахар', description: '5.5 ммоль/л' },
-          { title: 'Вес', description: '70 кг' },
-        ],
-        nextAppointments:[
-          { clinic:"Инвитро",doctorType:"Терапевт",date:'07.12.2024',time: "10:00" },
-          { clinic:"Инвитро",doctorType:"Окулист",date:'10.12.2024',time: "11:00" },
-          { clinic:"ДокторАйболит",doctorType:"Окулист",date:'13.12.2024',time: "12:00" },
-          { clinic:"ДокторАйболит",doctorType:"Терапевт",date:'16.12.2024',time: "13:00" },
-          { clinic:"ДокторАйболит",doctorType:"Терапевт",date:'02.05.2003',time: "13:00" },
-          { clinic:"ДокторАйболит",doctorType:"Терапевт",date:'03.05.2003',time: "13:00" },
-        ],
-        medicines : [
-          {
-            data: '02.05.2003',
-            drug: [
-              {name:"Ингавирин 90", time: '10:00', dose: '5 мг' },
-              {name:"Ингавирин 90", time: '11:00', dose: '5 мг' },
-              {name:"Ингавирин 90", time: '12:00', dose: '5 мг' },
-            ],
-          },
-          {
-            data: '03.05.2003',
-            drug: [
-              {name:"Ингавирин 90", time: '10:00', dose: '5 мг' },
-              {name:"Ингавирин 90", time: '11:00', dose: '5 мг' },
-              {name:"Ингавирин 90", time: '12:00', dose: '5 мг' },
-            ],
-          }
-        ],
-        allMeasurements : [
-          {
-            title: 'Сахар7',
-            descriptions: [
-              {value:5.5, text: '5.5 ммоль/л', date: '21.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '22.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '23.01.2001' },
-            ],
-          },
-          {
-            title: 'Сахар6',
-            descriptions: [
-              {value:5.5, text: '5.5 ммоль/л', date: '21.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '22.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '23.01.2001' },
-            ],
-          },
-          {
-            title: 'Сахар5',
-            descriptions: [
-              {value:5.5, text: '5.5 ммоль/л', date: '21.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '22.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '23.01.2001' },
-            ],
-          },
-          {
-            title: 'Сахар4',
-            descriptions: [
-              {value:5.5, text: '5.5 ммоль/л', date: '21.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '22.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '23.01.2001' },
-            ],
-          },
-          {
-            title: 'Сахар3',
-            descriptions: [
-              {value:5.5, text: '5.5 ммоль/л', date: '21.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '22.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '23.01.2001' },
-            ],
-          },
-          {
-            title: 'Сахар2',
-            descriptions: [
-              {value:5.5, text: '5.5 ммоль/л', date: '21.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '22.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '23.01.2001' },
-            ],
-          },
-          {
-            title: 'Сахар1',
-            descriptions: [
-              {value:5.5, text: '5.5 ммоль/л', date: '21.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '22.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '23.01.2001' },
-            ],
-          },
-          
-          {
-            title: 'Сахар',
-            descriptions: [
-              {value:5.5, text: '5.5 ммоль/л', date: '21.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '22.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '23.01.2001' },
-            ],
-          },
-          {
-            title: 'Кровь',
-            descriptions: [
-              {value:5.5, text: '5.5 ммоль/л', date: '21.01.2001' },
-              {value:6.0, text: '6.0 ммоль/л', date: '22.01.2001' },
-            ],
-          },
-          {
-            title: 'Вес',
-            descriptions: [
-              { value:70, text: '70 кг', date: '21.01.2001' },
-              { value:71, text: '71 кг', date: '22.01.2001' },
-            ],
-          },
-        ],
-        users: [
-          { avatar: 'https://avatars.mds.yandex.net/get-kinopoisk-image/1773646/ce0d6c2f-db6f-4bab-a5b6-b2773bed43e1/1920x', name: 'Ирина Вайт',gender:'male', role: 'Жена Волтера',birthDate:'19.05.1985',comment:'Миссис Вайт Хайзенберговна', id:'226' },
-          { avatar: 'https://avatars.mds.yandex.net/get-kinopoisk-image/1704946/cda9396d-5553-471d-8014-be50e3f0f0ff/1920x', name: 'Мл.Волтер Вайт',gender:'male', role: 'Сын Волтера',birthDate:'20.03.2003',comment:'Младший Волтер Вайт Хайзенбергович', id:'228' },
-          { avatar: 'https://avatars.mds.yandex.net/get-kinopoisk-image/1629390/0e083240-de28-4b2b-b9cf-9963cf27aa57/1920x', name: 'Джесси Пикми',gender:'male', role: 'Жертва Волтера Вайтера',birthDate:'19.09.1999',comment:'Джесси Пикман #sadboy', id:'229' },
-          { avatar: 'https://avatars.mds.yandex.net/get-kinopoisk-image/1900788/c80c11fa-e8d0-44ab-9b18-6b357ae8e03a/1920x', name: 'Хэнк Хэнкович',gender:'male', role: 'Свояк Волтера',birthDate:'19.01.1991',comment:'Самый злой Хэнк', id:'227' },
-        ],
-        appointments: [
-          { 
-            id:'220',
-            doctorType: 'Кардиолог',
-            appointmentData: '12.12.2023',
-            doctorComment: 'Проверить давление jhsdfhjk skdjhjksdfh kjsdhfjkshdf ksjdhfjksdhf kjsdhfkjhsdf kjsdhfkываываываываываываsdfdsfsdfsdf',
-            photo: 'https://avatars.mds.yandex.net/get-kinopoisk-image/1773646/ce0d6c2f-db6f-4bab-a5b6-b2773bed43e1/1920x',
-            clinic: 'Клиника 1',
-            doctorFio: 'Иванов Иван Иванович',
-            diagnosis: 'Гипертония',
-            dateNextAppointment: '20.12.2023',
-        },
-          { 
-            id:'221',
-            doctorType: 'Кардиолог',
-            appointmentData: '12.12.2023',
-            doctorComment: 'Проверить давление jhsdfhjk skdjhjksdfh kjsdhfjkshdf ksjdhfjksdhf kjsdhfkjhsdf kjsdhfkываываываываываываsdfdsfsdfsdf',
-            photo: 'https://avatars.mds.yandex.net/get-kinopoisk-image/1773646/ce0d6c2f-db6f-4bab-a5b6-b2773bed43e1/1920x',
-            clinic: 'Клиника 1',
-            doctorFio: 'Иванов Иван Иванович',
-            diagnosis: 'Гипертония',
-            dateNextAppointment: '20.12.2023',
-        },
-          { 
-            id:'222',
-            doctorType: 'Кардиолог',
-            appointmentData: '12.12.2023',
-            doctorComment: 'Проверить давление jhsdfhjk skdjhjksdfh kjsdhfjkshdf ksjdhfjksdhf kjsdhfkjhsdf kjsdhfkываываываываываываsdfdsfsdfsdf',
-            photo: 'https://avatars.mds.yandex.net/get-kinopoisk-image/1773646/ce0d6c2f-db6f-4bab-a5b6-b2773bed43e1/1920x',
-            clinic: 'Клиника 1',
-            doctorFio: 'Иванов Иван Иванович',
-            diagnosis: 'Гипертония',
-            dateNextAppointment: '20.12.2023',
-        },
-          { 
-            id:'223',
-            doctorType: 'Кардиолог',
-            appointmentData: '12.12.2023',
-            doctorComment: 'Проверить давление jhsdfhjk skdjhjksdfh kjsdhfjkshdf ksjdhfjksdhf kjsdhfkjhsdf kjsdhfkываываываываываываsdfdsfsdfsdf',
-            photo: 'https://avatars.mds.yandex.net/get-kinopoisk-image/1773646/ce0d6c2f-db6f-4bab-a5b6-b2773bed43e1/1920x',
-            clinic: 'Клиника 1',
-            doctorFio: 'Иванов Иван Иванович',
-            diagnosis: 'Гипертония',
-            dateNextAppointment: '20.12.2023',
-        },
-          { 
-            id:'224',
-            doctorType: 'Кардиолог',
-            appointmentData: '12.12.2023',
-            doctorComment: 'Проверить давление jhsdfhjk skdjhjksdfh kjsdhfjkshdf ksjdhfjksdhf kjsdhfkjhsdf kjsdhfkываываываываываываsdfdsfsdfsdf',
-            photo: 'https://avatars.mds.yandex.net/get-kinopoisk-image/1773646/ce0d6c2f-db6f-4bab-a5b6-b2773bed43e1/1920x',
-            clinic: 'Клиника 1',
-            doctorFio: 'Иванов Иван Иванович',
-            diagnosis: 'Гипертония',
-            dateNextAppointment: '20.12.2023',
-        },
-          { 
-            id:'225',
-            doctorType: 'Кардиолог',
-            appointmentData: '12.12.2023',
-            doctorComment: 'Проверить давление jhsdfhjk skdjhjksdfh kjsdhfjkshdf ksjdhfjksdhf kjsdhfkjhsdf kjsdhfkываываываываываываsdfdsfsdfsdf',
-            photo: 'https://avatars.mds.yandex.net/get-kinopoisk-image/1773646/ce0d6c2f-db6f-4bab-a5b6-b2773bed43e1/1920x',
-            clinic: 'Клиника 1',
-            doctorFio: 'Иванов Иван Иванович',
-            diagnosis: 'Гипертония',
-            dateNextAppointment: '20.12.2023',
-        },
-          { 
-            id:'226',
-            doctorType: 'Кардиолог',
-            appointmentData: '12.12.2023',
-            doctorComment: 'Проверить давление jhsdfhjk skdjhjksdfh kjsdhfjkshdf ksjdhfjksdhf kjsdhfkjhsdf kjsdhfkываываываываываываsdfdsfsdfsdf',
-            photo: 'https://avatars.mds.yandex.net/get-kinopoisk-image/1773646/ce0d6c2f-db6f-4bab-a5b6-b2773bed43e1/1920x',
-            clinic: 'Клиника 1',
-            doctorFio: 'Иванов Иван Иванович',
-            diagnosis: 'Гипертония',
-            dateNextAppointment: '20.12.2023',
-        },
-        { 
-          id:'227',
-            doctorType: 'Терапевт', 
-            appointmentData: '15.12.2023', 
-            doctorComment: 'Общий осмотр sdjhsjkldf skdfhjksdfh kjsdhfkjds fkjsdfh sdkfjh sdfkjsdhf',
-            photo: 'https://i3.wp.com/profmed1-nsk.com/photo/13/КУПИТЬ%20СПРАВКУ%20О%20ПОСЕЩЕНИИ%20ВРАЧА.jpg?ssl=1',
-            clinic: 'Клиника 2',
-            doctorFio: 'Петров Петр Петрович',
-            diagnosis: 'Острые респираторные инфекции',
-            dateNextAppointment: '25.12.2023',
-        }
-        ],
-      };
-
-      // Сохранение данных в состояние
-      dispatch({ type: actionTypes.SET_CLIENT_DATA, payload: data });
-    } catch (error) {
-      dispatch({ type: actionTypes.SET_ERROR, payload: error.message });
-    }
-  };
-
-  // Загружаем данные при монтировании компонента, если данных нет
+  const navigation = useNavigation();
+  
   useEffect(() => {
-    if (!state.clientData) {
-      fetchClientData();
+    // Получаем данные из localStorage
+    const storedClientData = localStorage.getItem('clientData');
+   
+    // Если данные из localStorage есть, обновляем состояние
+    if (storedClientData) {
+      const parsedClientData = JSON.parse(storedClientData);
+     
+      // Проверяем, что id существует и обновляем состояние
+      if (parsedClientData?.id && parsedClientData.id !== state.clientData.id) {
+        dispatch({
+          type: 'SET_CLIENT_DATA',
+          payload: parsedClientData,
+        });
+      }
+      
+      
     }
-  }, [state.clientData]); // Эффект зависит от состояния clientData
+
+    // Логирование для отладки
+    console.log('clientData (from localStorage):', state.clientData); 
+
+    // Если id не найден, отправляем на страницу авторизации
+    if (!state.clientData?.id_account) {
+      navigation.navigate('Authorizate');
+    } else {
+      navigation.navigate('Main');
+      // Только если id есть и данные еще не загружены (например, clientName или avatar)
+       if (!state.clientData.clientName || !state.clientData.avatar) {
+        const fetchUserData = async () => {
+          try {
+            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}`);
+            if (!response.ok) {
+              throw new Error('Ошибка при получении данных пользователя');
+            }
+            const data = await response.json();
+
+            // Обновляем данные в состоянии
+            dispatch({
+              type: 'SET_CLIENT_DATA',
+              payload: {
+                clientName: data.clientName,
+                avatar: data.avatar,
+              },
+            });
+          } catch (error) {
+            console.error('Ошибка при запросе данных о пользователе:', error);
+          }
+        };
+
+        fetchUserData();
+      }
+
+
+      if (state.clientData.users.length==0) {
+        const fetchUsersByAccount  = async () => {
+          try {
+            const response = await fetch(`http://127.0.0.1:8000/account/${state.clientData.id_account}/users`);
+            if (!response.ok) {
+              throw new Error('Ошибка при получении данных пользователя');
+            }
+            const data = await response.json();
+
+            // Обновляем данные в состоянии
+            dispatch({
+              type: 'SET_CLIENT_DATA',
+              payload: {
+                users: data,
+              },
+            });
+          } catch (error) {
+            console.error('Ошибка при запросе данных о пользователе:', error);
+          }
+        };
+        fetchUsersByAccount();
+      }
+
+
+      if (state.clientData.appointments.length==0) {
+        const fetchAppointmentsByUser  = async () => {
+          try {
+            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}/appointments`);
+            if (!response.ok) {
+              throw new Error('Ошибка при получении данных о приемах');
+            }
+            const data = await response.json();
+
+            // Обновляем данные в состоянии
+            dispatch({
+              type: 'SET_CLIENT_DATA',
+              payload: {
+                appointments: data,
+              },
+            });
+          } catch (error) {
+            console.error('Ошибка при запросе данных о приемах:', error);
+          }
+        };
+
+        fetchAppointmentsByUser();
+      }
+
+
+      if (state.clientData.allMeasurements.length==0) {
+        const fetchallMeasurementsByUser  = async () => {
+          try {
+            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}/analyzes`);
+            if (!response.ok) {
+              throw new Error('Ошибка при получении данных об анализах');
+            }
+            const data = await response.json();
+
+            // Обновляем данные в состоянии
+            dispatch({
+              type: 'SET_CLIENT_DATA',
+              payload: {
+                allMeasurements: data.allMeasurements,
+              },
+            });
+          } catch (error) {
+            console.error('Ошибка при запросе данных об анализах:', error);
+          }
+        };
+
+        fetchallMeasurementsByUser();
+      }
+
+      if (state.clientData.pressureChart.length==0) {
+        const fetchallPressureChartByUser  = async () => {
+          try {
+            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}/pressure`);
+            if (!response.ok) {
+              throw new Error('Ошибка при получении данных об давлении');
+            }
+            const data = await response.json();
+
+            // Обновляем данные в состоянии
+            dispatch({
+              type: 'SET_CLIENT_DATA',
+              payload: {
+                pressureChart: data,
+              },
+            });
+          } catch (error) {
+            console.error('Ошибка при запросе данных об давлении:', error);
+          }
+        };
+
+        fetchallPressureChartByUser();
+      }
+
+
+      if (state.clientData.lastMeasurements.length==0) {
+        const fetchLastMeasurementsByUser  = async () => {
+          try {
+            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}/last_analyzes`);
+            if (!response.ok) {
+              throw new Error('Ошибка при получении данных о последних анализах');
+            }
+            const data = await response.json();
+
+            // Обновляем данные в состоянии
+            dispatch({
+              type: 'SET_CLIENT_DATA',
+              payload: {
+                lastMeasurements: data.lastAnalyzes,
+              },
+            });
+          } catch (error) {
+            console.error('Ошибка при запросе данных о последних анализах:', error);
+          }
+        };
+
+        fetchLastMeasurementsByUser();
+      }
+
+      if (state.clientData.nextAppointments.length==0) {
+        const fetchNextAppointmentsByUser  = async () => {
+          try {
+            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}/reminders`);
+            if (!response.ok) {
+              throw new Error('Ошибка при получении данных о последующих приемах');
+            }
+            const data = await response.json();
+
+            // Обновляем данные в состоянии
+            dispatch({
+              type: 'SET_CLIENT_DATA',
+              payload: {
+                nextAppointments: data,
+              },
+            });
+          } catch (error) {
+            console.error('Ошибка при запросе данных о последующих приемах:', error);
+          }
+        };
+
+        fetchNextAppointmentsByUser();
+      }
+
+      if (state.clientData.medicines.length==0) {
+        const fetchMedicinesByUser  = async () => {
+          try {
+            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}/reminders_before_date`);
+            if (!response.ok) {
+              throw new Error('Ошибка при получении данных о таблетках');
+            }
+            const data = await response.json();
+
+            // Обновляем данные в состоянии
+            dispatch({
+              type: 'SET_CLIENT_DATA',
+              payload: {
+                medicines: data.medicines,
+              },
+            });
+          } catch (error) {
+            console.error('Ошибка при запросе данных о таблетках:', error);
+          }
+        };
+
+        fetchMedicinesByUser();
+      }
+
+      if (state.clientData.notifications.length==0) {
+        const fetchNotificationsByUser  = async () => {
+          try {
+            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}/reminders/nearest`);
+            if (!response.ok) {
+              throw new Error('Ошибка при получении данных о последних уведомлениях');
+            }
+            const data = await response.json();
+
+            // Обновляем данные в состоянии
+            dispatch({
+              type: 'SET_CLIENT_DATA',
+              payload: {
+                notifications: data,
+              },
+            });
+          } catch (error) {
+            console.error('Ошибка при запросе данных о последних уведомлениях:', error);
+          }
+        };
+
+        fetchNotificationsByUser();
+      }
+    }
+  }, [state.clientData.id, navigation]); // Используем state.clientData.id для зависимости
 
   return (
     <ClientDataContext.Provider value={{ state, dispatch }}>
@@ -293,3 +295,6 @@ export const ClientDataProvider = ({ children }) => {
     </ClientDataContext.Provider>
   );
 };
+
+// Хук для доступа к данным
+export const useClientData = () => useContext(ClientDataContext);

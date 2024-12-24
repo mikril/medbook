@@ -1,14 +1,40 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Text, View, StyleSheet, FlatList, Button, Dimensions, Image, TouchableOpacity } from 'react-native';
 import { useClientData } from '../../ClientDataContext';
 import { useNavigation } from '@react-navigation/native';
 import User from './user/user';
+import { addUserToAccount } from './api';
 
 const Accounts = () => {
-  const { state } = useClientData();
-  const [clientData] = useState(state.clientData);
+  const { state, dispatch } = useClientData();
+  const clientData = state.clientData;
 
   const navigation = useNavigation();
+  const handleLogout = () => {
+    navigation.navigate('Authorizate');
+    localStorage.clear();
+    
+    // Редирект на страницу авторизации
+    
+  };
+ 
+  const handleAddUser = async () => {
+    try {
+      const newUser = await addUserToAccount(clientData.id_account);
+      console.log("Новый пользователь добавлен:", newUser);
+
+      await dispatch({
+        type: "SET_CLIENT_DATA",
+        payload: {
+          
+          users: [...clientData.users, newUser.user]
+         
+        },
+      });
+    } catch (error) {
+      console.error("Ошибка при добавлении пользователя:", error);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -29,21 +55,16 @@ const Accounts = () => {
 
     <View style={styles.footer}>
     <TouchableOpacity
-
+    onPress={handleAddUser}
     style={styles.button} // Меняем цвет фона
   >
     <Text style={styles.buttonText}>Добавить пользователя</Text> {/* Меняем цвет текста */}
   </TouchableOpacity>
   <TouchableOpacity
- 
+    onPress={handleLogout}
     style={styles.button } // Меняем цвет фона
   >
-    <Text style={styles.buttonText}>Выйти</Text> {/* Меняем цвет текста */}
-  </TouchableOpacity>
-  <TouchableOpacity
-    style={styles.button} // Меняем цвет фона
-  >
-    <Text style={[styles.buttonText, { color: '#FF4136' }]}>Удалить аккаунт</Text> {/* Меняем цвет текста */}
+    <Text style={[styles.buttonText, { color: '#FF4136' }]} >Выйти</Text> {/* Меняем цвет текста */}
   </TouchableOpacity>
       </View>
     </View>

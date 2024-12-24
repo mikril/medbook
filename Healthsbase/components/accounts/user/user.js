@@ -1,16 +1,44 @@
 import React from 'react';
 import { Text, Image, View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import { useClientData } from '../../../ClientDataContext';
 const { width } = Dimensions.get('window');
 
 const User = ({ avatar, name, id }) => {
+  const { state, dispatch } = useClientData();
+  const clientData = state.clientData;
   const navigation = useNavigation();
-
+  const handleCardClick = async() => {
+    localStorage.setItem('clientData', JSON.stringify({
+      id: id,  // ID пользователя
+      id_account: clientData.id_account
+    }));
+    await dispatch({
+      type: "SET_CLIENT_DATA",
+      payload: {
+        id:  "asd",  // Оставляем только id
+        id_account: clientData.id_account,  // Оставляем только id_account
+        clientName: null,  // Обнуляем clientName
+        avatar: null,  // Обнуляем avatar
+        notifications: [],  // Обнуляем notifications
+        pressureChart: [],  // Обнуляем pressureChart
+        lastMeasurements: [],  // Обнуляем lastMeasurements
+        nextAppointments: [],  // Обнуляем nextAppointments
+        medicines: [],  // Обнуляем medicines
+        allMeasurements: [],  // Обнуляем allMeasurements
+        users: [],  // Обнуляем users
+        appointments: []
+      },
+    });
+    await navigation.navigate('Main');
+    console.log("Selected user ID:", id); // Logging the selected user ID
+  };
   return (
     <View style={styles.userCard}>
-      <Image source={avatar} style={styles.profileImage} />
-      <Text style={styles.userName}>{name}</Text>
+      <TouchableOpacity onPress={handleCardClick} style={styles.cardTouchable}>
+        <Image source={avatar} style={styles.profileImage} />
+        <Text style={styles.userName}>{name}</Text>
+      </TouchableOpacity>
       <TouchableOpacity
         onPress={() => navigation.navigate('Acount', { userId: id })}
       >
@@ -53,7 +81,11 @@ const styles = StyleSheet.create({
     height: width*0.065,
 
   },
-
+  cardTouchable: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
 });
 
 export default User;

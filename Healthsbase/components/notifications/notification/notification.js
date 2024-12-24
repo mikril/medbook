@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View, StyleSheet, Dimensions } from 'react-native';
+import { Text, View, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -13,11 +13,20 @@ const Notification = ({ name, dose, doctorType, time }) => {
       </View>
 
       <Text style={styles.timeText}>{time}</Text>
+     
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  deleteButton: {
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    fontWeight: 'bold',
+    fontSize: width * 0.04,
+
+    paddingLeft: width * 0.03,
+  },
   notificationContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
