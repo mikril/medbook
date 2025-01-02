@@ -3,7 +3,9 @@ import { TouchableOpacity,FlatList, Image ,Modal , Text, View,Button, StyleSheet
 import { TimePickerModal } from 'react-native-paper-dates';
 import DatePicker from 'react-native-modern-datepicker';
 import { useClientData } from '../../../ClientDataContext';
+import Constants from 'expo-constants';
 const { width, height } = Dimensions.get('window');
+
 const AddMedecine = ({ userId }) => {
   const [name, setName] = useState('');
   const [doze, setDoze] = useState('');
@@ -111,9 +113,9 @@ const AddMedecine = ({ userId }) => {
     };
   
     console.log(reminderData);
-  
+    const apiUrl = Constants.manifest.extra.apiUrl;
     // Отправка данных на сервер
-    fetch(`http://127.0.0.1:8000/user/${clientData.id}/reminder_medicine`, {
+    fetch(`${apiUrl}/user/${clientData.id}/reminder_medicine`, {
       method: 'POST',
       headers: {
         Accept: 'application/json',

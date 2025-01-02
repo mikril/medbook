@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TouchableOpacity, Text, View, FlatList, StyleSheet, Dimensions } from 'react-native';
+import { TouchableOpacity, Text,TextInput, View, FlatList, StyleSheet, Dimensions } from 'react-native';
 import { useClientData } from '../../ClientDataContext';
 import NavigationPanel from '../navigationPanel/navigationPanel';
 import Measurement from './measurement/measurement';
@@ -10,16 +10,35 @@ const Measurements = () => {
   const { state } = useClientData();
   const [clientData, setClientData] = useState(state.clientData);
   const navigation = useNavigation();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredMeasurements, setFilteredMeasurements] = useState(clientData.allMeasurements);
   useEffect(() => {
     setClientData(state.clientData);
+    console.log(clientData.allMeasurements);
   }, []);
+
+  useEffect(() => {
+      const filteredData = clientData.allMeasurements.filter(item => {
+        const queryLower = searchQuery.toLowerCase();
+        return (
+          item.title.toLowerCase().includes(queryLower) 
+        );
+      });
+      setFilteredMeasurements(filteredData);
+    }, [searchQuery, clientData.appointments]);
 
   return (
     <View style={styles.page}>
       <View style={styles.container}>
         <Text style={styles.header}>Анализы</Text>
+        <TextInput
+                  style={styles.searchInput}
+                  placeholder="Поиск"
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}  // Обновление состояния при изменении текста
+                />
         <FlatList
-          data={clientData.allMeasurements}
+          data={filteredMeasurements}
           renderItem={({ item }) => <Measurement item={item} />}
           keyExtractor={(item) => item.title}
           ListFooterComponent={
@@ -39,6 +58,15 @@ const styles = StyleSheet.create({
     height: height
   },
   menu: {
+  },
+  searchInput: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingLeft: 10,
+    marginBottom: 20,
+    fontSize: 16,
   },
   container: {
     flex: 1,

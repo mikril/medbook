@@ -1,8 +1,9 @@
+import Constants from 'expo-constants';
 export const authorizateUser = async (userData, dispatch) => {
   console.log('Отправляем данные на сервер для авторизации:', userData);  // Логируем данные перед отправкой
-
+  const apiUrl = Constants.manifest.extra.apiUrl;
   try {
-    const response = await fetch('http://127.0.0.1:8000/authorizate', {
+    const response = await fetch(`${apiUrl}/authorizate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

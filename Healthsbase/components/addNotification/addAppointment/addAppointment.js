@@ -4,6 +4,7 @@ import { TimePickerModal } from 'react-native-paper-dates';
 import DatePicker from 'react-native-modern-datepicker';
 import { useClientData } from '../../../ClientDataContext';
 const { width, height } = Dimensions.get('window');
+import Constants from 'expo-constants';
 
 const AddAppointment = ({ userId }) => {
   const { state, dispatch } = useClientData();
@@ -80,8 +81,8 @@ const AddAppointment = ({ userId }) => {
       };
 
       console.log('Отправляемые данные:', reminderData);
-
-      const response = await fetch(`http://127.0.0.1:8000/user/${clientData.id}/reminder_appointment`, {
+      const apiUrl = Constants.manifest.extra.apiUrl;
+      const response = await fetch(`${apiUrl}/user/${clientData.id}/reminder_appointment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

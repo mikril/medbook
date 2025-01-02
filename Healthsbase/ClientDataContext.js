@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 import { useNavigation } from '@react-navigation/native'; // Для редиректа
-
+import Constants from 'expo-constants';
 // Дефолтные данные
 const data = {
   clientName: null,
@@ -60,7 +60,7 @@ export const ClientDataProvider = ({ children }) => {
 
     // Логирование для отладки
     console.log('clientData (from localStorage):', state.clientData); 
-
+    const apiUrl = Constants.manifest.extra.apiUrl;
     // Если id не найден, отправляем на страницу авторизации
     if (!state.clientData?.id_account) {
       navigation.navigate('Authorizate');
@@ -70,7 +70,7 @@ export const ClientDataProvider = ({ children }) => {
        if (!state.clientData.clientName || !state.clientData.avatar) {
         const fetchUserData = async () => {
           try {
-            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}`);
+            const response = await fetch(`${apiUrl}/user/${state.clientData.id}`);
             if (!response.ok) {
               throw new Error('Ошибка при получении данных пользователя');
             }
@@ -96,7 +96,7 @@ export const ClientDataProvider = ({ children }) => {
       if (state.clientData.users.length==0) {
         const fetchUsersByAccount  = async () => {
           try {
-            const response = await fetch(`http://127.0.0.1:8000/account/${state.clientData.id_account}/users`);
+            const response = await fetch(`${apiUrl}/account/${state.clientData.id_account}/users`);
             if (!response.ok) {
               throw new Error('Ошибка при получении данных пользователя');
             }
@@ -120,7 +120,7 @@ export const ClientDataProvider = ({ children }) => {
       if (state.clientData.appointments.length==0) {
         const fetchAppointmentsByUser  = async () => {
           try {
-            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}/appointments`);
+            const response = await fetch(`${apiUrl}/user/${state.clientData.id}/appointments`);
             if (!response.ok) {
               throw new Error('Ошибка при получении данных о приемах');
             }
@@ -145,7 +145,7 @@ export const ClientDataProvider = ({ children }) => {
       if (state.clientData.allMeasurements.length==0) {
         const fetchallMeasurementsByUser  = async () => {
           try {
-            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}/analyzes`);
+            const response = await fetch(`${apiUrl}/user/${state.clientData.id}/analyzes`);
             if (!response.ok) {
               throw new Error('Ошибка при получении данных об анализах');
             }
@@ -169,7 +169,7 @@ export const ClientDataProvider = ({ children }) => {
       if (state.clientData.pressureChart.length==0) {
         const fetchallPressureChartByUser  = async () => {
           try {
-            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}/pressure`);
+            const response = await fetch(`${apiUrl}/user/${state.clientData.id}/pressure`);
             if (!response.ok) {
               throw new Error('Ошибка при получении данных об давлении');
             }
@@ -194,7 +194,7 @@ export const ClientDataProvider = ({ children }) => {
       if (state.clientData.lastMeasurements.length==0) {
         const fetchLastMeasurementsByUser  = async () => {
           try {
-            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}/last_analyzes`);
+            const response = await fetch(`${apiUrl}/user/${state.clientData.id}/last_analyzes`);
             if (!response.ok) {
               throw new Error('Ошибка при получении данных о последних анализах');
             }
@@ -218,7 +218,7 @@ export const ClientDataProvider = ({ children }) => {
       if (state.clientData.nextAppointments.length==0) {
         const fetchNextAppointmentsByUser  = async () => {
           try {
-            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}/reminders`);
+            const response = await fetch(`${apiUrl}/user/${state.clientData.id}/reminders`);
             if (!response.ok) {
               throw new Error('Ошибка при получении данных о последующих приемах');
             }
@@ -242,7 +242,7 @@ export const ClientDataProvider = ({ children }) => {
       if (state.clientData.medicines.length==0) {
         const fetchMedicinesByUser  = async () => {
           try {
-            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}/reminders_before_date`);
+            const response = await fetch(`${apiUrl}/user/${state.clientData.id}/reminders_before_date`);
             if (!response.ok) {
               throw new Error('Ошибка при получении данных о таблетках');
             }
@@ -266,7 +266,7 @@ export const ClientDataProvider = ({ children }) => {
       if (state.clientData.notifications.length==0) {
         const fetchNotificationsByUser  = async () => {
           try {
-            const response = await fetch(`http://127.0.0.1:8000/user/${state.clientData.id}/reminders/nearest`);
+            const response = await fetch(`${apiUrl}/user/${state.clientData.id}/reminders/nearest`);
             if (!response.ok) {
               throw new Error('Ошибка при получении данных о последних уведомлениях');
             }

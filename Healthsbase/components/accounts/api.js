@@ -1,8 +1,10 @@
+import Constants from 'expo-constants';
 export const addUserToAccount  = async (accountId) => {
   console.log('Добовляем пользавателя', accountId);  // Логируем письку перед отправкой
-
+  
   try {
-    const response = await fetch(`http://127.0.0.1:8000/account/${accountId}/add_user`, {
+    const apiUrl = Constants.manifest.extra.apiUrl;
+    const response = await fetch(`${apiUrl}/account/${accountId}/add_user`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

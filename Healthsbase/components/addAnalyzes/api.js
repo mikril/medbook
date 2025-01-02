@@ -1,4 +1,4 @@
-// api.js
+import Constants from 'expo-constants';
 export const handleSubmit = async (imageFile, setDate, setAnalyzes) => {
   if (!imageFile) {
     console.error("Файл изображения не выбран");
@@ -10,7 +10,8 @@ export const handleSubmit = async (imageFile, setDate, setAnalyzes) => {
 
   try {
     // Первый запрос: получаем токен
-    const tokenResponse = await fetch('http://192.168.0.106:5000/token', {
+    const vadimUrl = Constants.manifest.extra.vadimUrl;
+    const tokenResponse = await fetch(`${vadimUrl}/token`, {
       method: 'GET',
       headers: {
         'Accept': 'application/json',
@@ -25,7 +26,7 @@ export const handleSubmit = async (imageFile, setDate, setAnalyzes) => {
     const token = tokenData.token;
 
     // Второй запрос: отправляем данные с использованием токена
-    const appointmentResponse = await fetch('http://192.168.0.106:5000/analyses', {
+    const appointmentResponse = await fetch(`${vadimUrl}/analyses`, {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
@@ -54,9 +55,9 @@ export const handleSubmit = async (imageFile, setDate, setAnalyzes) => {
 
 export const addAnalyze2  = async (accountId, analyzeData) => {
   console.log('Добавляем анализ', accountId, analyzeData);  // Логируем перед отправкой
-
+  const apiUrl = Constants.manifest.extra.apiUrl;
   try {
-    const response = await fetch(`http://127.0.0.1:8000/user/${accountId}/analyzes`, {
+    const response = await fetch(`${apiUrl}/user/${accountId}/analyzes`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

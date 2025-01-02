@@ -1,8 +1,9 @@
+import Constants from 'expo-constants';
 export const deleteMeasurement  = async (analysis_id ) => {
     console.log('Удаляем анализ', analysis_id );  // Логируем перед отправкой
-  
+    const apiUrl = Constants.manifest.extra.apiUrl;
     try {
-      const response = await fetch(`http://127.0.0.1:8000/delete/analysis/${analysis_id}`, {
+      const response = await fetch(`${apiUrl}/delete/analysis/${analysis_id}`, {
         method: "DELETE",
       });
       if (!response.ok) {

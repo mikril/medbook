@@ -1,3 +1,4 @@
+import Constants from 'expo-constants';
 export const handleSubmit = (imageFile, setDoctorType, setDateAppointment, setClinic, setDoctorFio, setDiagnosis, setComment, setDateNextAppointment) => {
   if (!imageFile) {
     console.error("Файл изображения не выбран");
@@ -9,7 +10,8 @@ export const handleSubmit = (imageFile, setDoctorType, setDateAppointment, setCl
   async function sendAppointment(base64, extension) {
     try {
       // Первый запрос: получаем токен
-      const tokenResponse = await fetch('http://192.168.0.106:5000/token', {
+      const vadimUrl = Constants.manifest.extra.vadimUrl;
+      const tokenResponse = await fetch(`${vadimUrl}/token`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',
@@ -24,7 +26,7 @@ export const handleSubmit = (imageFile, setDoctorType, setDateAppointment, setCl
       const token = tokenData.token;
   
       // Второй запрос: отправляем данные с использованием токена
-      const appointmentResponse = await fetch('http://192.168.0.106:5000/appointment', {
+      const appointmentResponse = await fetch(`${vadimUrl}/appointment`, {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -62,9 +64,9 @@ export const handleSubmit = (imageFile, setDoctorType, setDateAppointment, setCl
 
 export const addAppointment  = async (accountId, appointmentData) => {
   console.log('Добавляем приём врача', accountId, appointmentData);  // Логируем перед отправкой
-
+  const apiUrl = Constants.manifest.extra.apiUrl;
   try {
-    const response = await fetch(`http://127.0.0.1:8000/user/${accountId}/appointment`, {
+    const response = await fetch(`${apiUrl}/user/${accountId}/appointment`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,8 +1,9 @@
+import Constants from 'expo-constants';
 export const addPressures  = async (id, messureData) => {
     console.log('Добавляем анализ', id, messureData);  // Логируем перед отправкой
-  
+    const apiUrl = Constants.manifest.extra.apiUrl;
     try {
-      const response = await fetch(`http://127.0.0.1:8000/user/${id}/pressure`, {
+      const response = await fetch(`${apiUrl}/user/${id}/pressure`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -11,8 +11,8 @@ import ast
 from typing import Optional
 
 # Настройки базы данных
-DATABASE_URL = "postgresql://postgres:787898@192.168.0.112:5432/healthsbase_database"
-
+#DATABASE_URL = "postgresql://postgres:787898@192.168.0.112:5432/healthsbase_database"
+DATABASE_URL = "postgresql://healthsbase:787898@healthsbase_database:5432/healthsbase"
 # Инициализация SQLAlchemy
 Base = declarative_base()
 engine = create_engine(DATABASE_URL)

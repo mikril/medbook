@@ -1,8 +1,9 @@
+import Constants from 'expo-constants';
 export const registerUser = async (userData, dispatch) => {
   console.log('Отправляем данные на сервер:', userData);  // Логируем перед отправкой данных
-
+  const apiUrl = Constants.manifest.extra.apiUrl;
   try {
-    const response = await fetch('http://127.0.0.1:8000/register', {
+    const response = await fetch(`${apiUrl}/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

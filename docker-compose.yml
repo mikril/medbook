@@ -1,0 +1,44 @@
+
+
+services:
+  healthsbase_database:
+    container_name: healthsbase_database
+    image: postgres:${POSTGRES_VERSION}
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_NAME}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASS} 
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+    volumes:
+      - ${POSTGRES_VOLUME}:/var/lib/postgresql/data/pgdata
+    expose:
+      - '5432'
+    ports:
+      - "9844:5432"
+
+
+  backend:
+    build:
+      context: ./server_healthsbase
+    ports:
+      - 8000:8000
+    environment:
+      DB_HOST: ${POSTGRES_HOST}
+      DB_PORT: ${POSTGRES_PORT}
+      DB_USER: ${POSTGRES_USER} 
+      DB_PASSWORD: ${POSTGRES_PASS} 
+      DB_NAME: ${POSTGRES_NAME} 
+    depends_on:
+      - healthsbase_database
+    restart: always
+
+  frontend:
+    build:
+      context: ./Healthsbase
+    ports:
+      - 8081:8081
+    depends_on:
+      - backend
+      - healthsbase_database
+    restart: always
