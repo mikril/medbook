@@ -9,6 +9,11 @@ from fastapi.responses import JSONResponse
 from typing import List, Dict
 import ast
 from typing import Optional
+from passlib.context import CryptContext
+
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
 
 # Настройки базы данных
 #DATABASE_URL = "postgresql://postgres:787898@192.168.0.112:5432/healthsbase_database"
@@ -145,7 +150,7 @@ async def login_account(auth: AuthLogin):
             raise HTTPException(status_code=404, detail="Аккаунт с таким номером телефона не найден")
 
         # Проверяем пароль
-        if db_auth.password != auth.password:
+        if not pwd_context.verify(auth.password, db_auth.password):
             raise HTTPException(status_code=401, detail="Неверный пароль")
 
         # Ищем пользователя, связанного с этим аккаунтом
@@ -175,7 +180,7 @@ def create_user_with_auth(db_session, user_data: UserCreate):
     db_user = Auth(
         email=user_data.email,
         phone=user_data.phone,
-        password=user_data.password,
+        password=pwd_context.hash(user_data.password),
     )
     db_session.add(db_user)
     db_session.commit()
