@@ -76,6 +76,7 @@ class ReminderMedicine(Base):
     id_author = Column(Integer, ForeignKey("users.id"), nullable=False)
     name_medicine = Column(String, nullable=False)
     dose = Column(Float, nullable=True)
+    dose_type = Column(String, nullable=True)
     reception_time = Column(String, nullable=False)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)

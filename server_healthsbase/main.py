@@ -16,7 +16,7 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 # Настройки базы данных
-#DATABASE_URL = "postgresql://postgres:787898@192.168.0.112:5432/healthsbase_database"
+#DATABASE_URL = "postgresql://postgres:787898@localhost:5432/medbook"
 DATABASE_URL = "postgresql://healthsbase:787898@healthsbase_database:5432/healthsbase"
 # Инициализация SQLAlchemy
 Base = declarative_base()
@@ -89,6 +89,7 @@ class ReminderMedicine(Base):
     id_author = Column(Integer, ForeignKey("users.id"), nullable=False)
     name_medicine = Column(String, nullable=False)
     dose = Column(Float, nullable=True)
+    dose_type = Column(String, nullable=True)
     reception_time = Column(String, nullable=False)
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
@@ -449,7 +450,7 @@ async def get_user(user_id: int):
         
         return {"id": user.id, "clientName": user.name, 'avatar': user.avatar}
     finally:
-        db_session.close()
+        db_session.close
 
 
 # Модель данных для добавления приёма врача
@@ -822,6 +823,7 @@ async def add_reminder_medicine(user_id: int, reminder_data: ReminderMedicineCre
                 id_author=user_id,
                 name_medicine=reminder_data.name_medicine,
                 dose=int(reminder_data.dose.split(" ")[0]),    
+                dose_type=reminder_data.dose.split(" ")[1], 
                 reception_time=time,  # Каждое время поочередно
                 start_date=reminder_data.start_date,
                 end_date=reminder_data.end_date,
@@ -877,7 +879,7 @@ async def get_reminders_before_date(user_id: int):
                     grouped_reminders[reminder_date].append({
                         "name": reminder.name_medicine,
                         "time": reminder.reception_time,
-                        "dose": f"{reminder.dose} мг" 
+                        "dose": f"{reminder.dose} {reminder.dose_type}" 
                     })
                 
                 start_date += timedelta(days=number_times)

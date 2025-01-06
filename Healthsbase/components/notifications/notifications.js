@@ -31,6 +31,8 @@ const Notifications = () => {
   useEffect(() => {
     const nextAppointments = state.clientData?.nextAppointments || [];
     const medicines = state.clientData?.medicines || [];
+    console.log(nextAppointments)
+    console.log(medicines)
 
     // Устанавливаем первый приём
     if (nextAppointments.length > 0) {
