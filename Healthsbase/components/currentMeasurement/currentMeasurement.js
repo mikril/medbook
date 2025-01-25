@@ -66,7 +66,7 @@ const CurrentMeasurement = ({ route }) => {
     <View style={styles.page}>
       <View style={styles.container}>
         <View style={styles.headerContainer}>
-          <Text style={styles.header}>{title}</Text>
+          <Text maxLength={5} style={styles.header}>{title}</Text>
           <TouchableOpacity onPress={handleClose}>
             <Image source={require('./src/HomeOutline.svg')} style={styles.imageMenuAccount} />
           </TouchableOpacity>

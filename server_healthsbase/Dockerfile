@@ -1,6 +1,8 @@
-# Dockerfile для FastAPI сервера
 FROM python:3.10.11
-RUN apt-get update && apt-get install -y netcat-openbsd
+
+# Устанавливаем bash, netcat и утилиту dos2unix
+RUN apt-get update && apt-get install -y bash netcat dos2unix
+
 # Устанавливаем рабочую директорию
 WORKDIR /app
 
@@ -8,17 +10,17 @@ WORKDIR /app
 COPY requirements.txt /app/
 RUN pip install --no-cache-dir -r requirements.txt
 
-
-
 # Копируем остальной код
 COPY . /app/
 
-# Устанавливаем разрешения на выполнение для скрипта wait-for-postgres.sh
+# Преобразуем скрипт в формат Unix (LF)
+RUN dos2unix wait-for-postgres.sh
+
+# Устанавливаем разрешения на выполнение для скрипта
 RUN chmod +x wait-for-postgres.sh
 
 # Открываем порт
 EXPOSE 8000
 
-# Команда для запуска FastAPI сервера
-
-CMD ["./wait-for-postgres.sh"]
+# Запускаем скрипт с использованием bash
+CMD ["/bin/bash", "./wait-for-postgres.sh"]

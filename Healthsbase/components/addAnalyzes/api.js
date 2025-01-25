@@ -45,7 +45,11 @@ export const handleSubmit = async (imageFile, setDate, setAnalyzes) => {
 
     const result = await appointmentResponse.json();
     setDate(result.date || '');
-    setAnalyzes(result.analyses || []);
+    const updatedAnalyses = result.analyses.map(analysis => ({
+      ...analysis,
+      value: `${analysis.value} ${analysis.metric}`
+    }));
+    setAnalyzes(updatedAnalyses || []);
 
     console.log('Успех:', result);
   } catch (error) {

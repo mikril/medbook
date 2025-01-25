@@ -5,7 +5,7 @@ import { useClientData } from '../../ClientDataContext';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { handleSubmit, addAppointment } from './api';
 import DatePicker from 'react-native-modern-datepicker';
-
+import  Loading  from '../loading/loading';
 
 
 const { width, height } = Dimensions.get('window');
@@ -40,14 +40,21 @@ const AddAppointment = () => {
   };
   
   const navigation = useNavigation();
-
+  const [loading, setLoading] = useState(false);
   const handleImagePick = () => {
-    launchImageLibrary({ mediaType: 'photo' }, (response) => {
+    launchImageLibrary({ mediaType: 'photo' }, async (response) => {
       if (response.assets && response.assets[0]) {
         const selectedImage = response.assets[0];
         setImageUri(selectedImage.uri);
-
-        handleSubmit(selectedImage, setDoctorType, setDateAppointment, setClinic, setDoctorFio, setDiagnosis, setComment, setDateNextAppointment); 
+        
+        try {
+          setLoading(true);  // Start loading
+          await handleSubmit(selectedImage, setDoctorType, setDateAppointment, setClinic, setDoctorFio, setDiagnosis, setComment, setDateNextAppointment);
+        } catch (error) {
+          Alert.alert("Ошибка", "Не удалось загрузить изображение");
+        } finally {
+          setLoading(false);  // Stop loading
+        }
       }
     });
   };
@@ -108,6 +115,10 @@ const AddAppointment = () => {
       Alert.alert("Ошибка", "Не удалось добавить приём врача");
     }
   };
+
+  if (loading){
+    return <Loading/>
+  }
 
   return (
     <View style={styles.container}>

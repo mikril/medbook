@@ -1,5 +1,5 @@
 import Constants from 'expo-constants';
-export const handleSubmit = (imageFile, setDoctorType, setDateAppointment, setClinic, setDoctorFio, setDiagnosis, setComment, setDateNextAppointment) => {
+export const handleSubmit = async (imageFile, setDoctorType, setDateAppointment, setClinic, setDoctorFio, setDiagnosis, setComment, setDateNextAppointment) => {
   if (!imageFile) {
     console.error("Файл изображения не выбран");
     return;
@@ -7,7 +7,7 @@ export const handleSubmit = (imageFile, setDoctorType, setDateAppointment, setCl
   var base64 = imageFile.uri.split(",")[1];
   var extension = imageFile.uri.split(",")[0].split(";")[1]
 
-  async function sendAppointment(base64, extension) {
+   async function sendAppointment(base64, extension) {
     try {
       // Первый запрос: получаем токен
       const vadimUrl = Constants.manifest.extra.vadimUrl;
@@ -59,7 +59,7 @@ export const handleSubmit = (imageFile, setDoctorType, setDateAppointment, setCl
     }
   }
   
-  sendAppointment(base64, extension);
+  await sendAppointment(base64, extension);
 };
 
 export const addAppointment  = async (accountId, appointmentData) => {

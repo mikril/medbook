@@ -9,7 +9,7 @@ const Measurement = ({ title = 'Показатель', description = 'Значе
   return (
     <TouchableOpacity style={styles.container}
     onPress={() => navigation.navigate('CurrentMeasurement', { title: title })}>
-      <Text style={styles.title}>{title}</Text>
+      <Text numberOfLines={1} maxLength={5} style={styles.title}>{title}</Text>
       <Text style={styles.description}>{description}</Text>
     </TouchableOpacity>
   );

@@ -15,7 +15,7 @@ cd medbook
 
 Установите докер по ссылке и выполните команду
 
-[Скачать проект](https://www.docker.com/products/docker-desktop/)
+[Скачать docker](https://www.docker.com/products/docker-desktop/)
 
 ```bash
 docker-compose up -d --build

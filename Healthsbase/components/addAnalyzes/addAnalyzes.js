@@ -6,6 +6,7 @@ import { useClientData } from '../../ClientDataContext';
 import { handleSubmit } from './api'; // Импортируем функцию handleSubmit
 import { addAnalyze2 } from './api';
 import DatePicker from 'react-native-modern-datepicker';
+import  Loading  from '../loading/loading';
 
 const { width, height } = Dimensions.get('window');
 
@@ -19,7 +20,7 @@ const AddAnalyzes = () => {
   const navigation = useNavigation();
   const validateDate = (value) => /^\d{4}-\d{2}-\d{2}$/.test(value);
   const validateAnalyzeName = (value) => value.trim().length > 0;
-  const validateAnalyzeValue = (value) => /^\d+\s?[a-zA-Zа-яА-Я]+$/.test(value);
+  const validateAnalyzeValue = (value) => /^[\d.,!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?а-яА-Яa-zA-Z\s]*$/.test(value);
 
   const [isModalVisible, setIsModalVisible] = useState(false); 
   const [isDatePickerVisible, setIsDatePickerVisible] = useState(false);
@@ -41,15 +42,22 @@ const AddAnalyzes = () => {
     return !newErrors.date && newErrors.analyzes.every((analyze) => !analyze.name && !analyze.value);
   };
 
-  // Функция для выбора изображения из галереи
+   const [loading, setLoading] = useState(false);
   const handleImagePick = () => {
-    launchImageLibrary({ mediaType: 'photo' }, (response) => {
+    launchImageLibrary({ mediaType: 'photo' }, async (response) => {
       if (response.assets && response.assets[0]) {
         const selectedImage = response.assets[0];
         setImageUri(selectedImage.uri); // Сохраняем URI изображения
         
-        // Передаем изображение в handleSubmit
-        handleSubmit(selectedImage, setDate, setAnalyzes);
+        try {
+          setLoading(true);  // Start loading
+          await handleSubmit(selectedImage, setDate, setAnalyzes); 
+        } catch (error) {
+              Alert.alert("Ошибка", "Не удалось загрузить изображение");
+            } finally {
+              console.log(analyzes);
+              setLoading(false);  // Stop loading
+            }
       }
     });
   };
@@ -65,7 +73,7 @@ const AddAnalyzes = () => {
   const addAnalyze = () => {
     setAnalyzes([
       ...analyzes,
-      { name: '', value: '' }, // Добавляем новый анализ с пустыми полями
+      { name: '', value: ''}, // Добавляем новый анализ с пустыми полями
     ]);
   };
 
@@ -109,7 +117,10 @@ const AddAnalyzes = () => {
     });
     await navigation.navigate('Main');
   };
-
+  if (loading){
+    return <Loading/>
+  }
+  
   return (
     <View style={styles.page}>
 
@@ -207,7 +218,7 @@ const AddAnalyzes = () => {
                  <Text style={styles.errorText}>{(errors.analyzes[index]?.value && errors.analyzes[index].value) || '\u00A0'}</Text>
                 <TextInput
                   value={item.value}
-                  onChangeText={(text) => handleAnalyzesChange(index, 'value', text)}
+                  onChangeText={(text) => handleAnalyzesChange(index, 'value', text)  }
                   placeholder="Значение"
                   placeholderTextColor="#BDBDBD"
                   style={styles.flatListValue}

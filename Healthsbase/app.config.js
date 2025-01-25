@@ -6,7 +6,7 @@ export default {
     slug: "healthsbase",
     extra: {
       apiUrl: process.env.REACT_APP_API_BASE_URL,
-      vadimUrl: process.env.REACT_APP_API_BASE_URL
+      vadimUrl: process.env.VADIM_NEIRO
     },
   },
 };

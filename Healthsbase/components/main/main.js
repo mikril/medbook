@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, Button, View, Image, FlatList, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
+import { Text,Linking, Button, View, Image, FlatList, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
 import Notification from './notification/notification';
 import Appointment from './appointment/appointment';
 import Measurement from './measurement/measurement';
@@ -86,7 +86,7 @@ const Main = () => {
       ))}
       </View>
     <TouchableOpacity 
-    style={styles.enrollButton}>
+    style={styles.enrollButton}  onPress={()=>Linking.openURL('https://www.gosuslugi.ru/help/faq/doctor/17')} >
       <Text 
     style={styles.enrollText}>Записаться на прием </Text>
       
